@@ -1,4 +1,3 @@
-
 using System.Net.Http;
 using HtmlAgilityPack;
 using Stolzenberg.Commands.Base;
