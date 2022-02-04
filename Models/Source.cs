@@ -1,5 +1,9 @@
-public class Source 
+
+namespace Stolzenberg.Models
 {
-    public string Link { get; set; }
-    public string HrefLink { get; set; }
+    public class Source 
+    {
+        public string Link { get; set; }
+        public string HrefLink { get; set; }
+    }
 }

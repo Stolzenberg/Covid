@@ -1,10 +1,13 @@
 using System.Text.Json.Serialization;
 
-public class Article 
+namespace Stolzenberg.Models
 {
-    [JsonPropertyName("header")]
-    public string Header { get; set; }
+    public class Article 
+    {
+        [JsonPropertyName("header")]
+        public string Header { get; set; }
 
-    [JsonPropertyName("link")]
-    public string Link { get; set; }
+        [JsonPropertyName("link")]
+        public string Link { get; set; }
+    }
 }
