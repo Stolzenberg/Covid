@@ -3,6 +3,12 @@
 
 Searches predefined web pages for articles that contain keywords, then puts the article headings and a direct link into a model and sends it back as a json array.
 
+**Design Patterns and Principles**
+- Commands
+- Dependency Injection
+- Services & Repositories
+- Single Responsibility Principle
+
 **Example how it would look like:**
 ```
 {
