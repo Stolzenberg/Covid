@@ -11,9 +11,10 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
+using System.Text.Json;
 using HtmlAgilityPack;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Stolzenberg.Covid
 {
@@ -26,6 +27,8 @@ namespace Stolzenberg.Covid
             new Source { Link = "https://edition.cnn.com/health", HrefLink = "https://edition.cnn.com" },
             new Source { Link = "https://www.medicalnewstoday.com", HrefLink = "https://www.medicalnewstoday.com"},
             new Source { Link = "https://www.news-medical.net", HrefLink = "https://www.news-medical.net"},
+            new Source { Link = "https://www.sciencenews.org", HrefLink = "https://www.sciencenews.org"},
+            new Source { Link = "https://scitechdaily.com", HrefLink = "https://scitechdaily.com"},
         };
 
         private readonly string[] _keywords = new string[] {
@@ -33,7 +36,11 @@ namespace Stolzenberg.Covid
             "corona",
             "vaccine",
             "pfizer",
-            "biontech"
+            "biontech",
+            "moderna",
+            "sars-cov-2",
+            "RNA",
+            "mRNA-1273",
         };
 
         public GetCovidInfo(ILogger<GetCovidInfo> log)
@@ -47,20 +54,17 @@ namespace Stolzenberg.Covid
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            _logger.LogInformation("Get covid info was triggerd executing get infos from sources now.");
 
-            await GetInfosFromSources();
+            var articles = await GetInfosFromSources();
 
-            string name = req.Query["name"];
+            _logger.LogInformation($"Return {articles.Count} articles as json.");
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            return new OkObjectResult("");
+            string data = JsonSerializer.Serialize(articles);
+            return new OkObjectResult(data);
         }
 
-        private async Task GetInfosFromSources() 
+        private async Task<List<Article>> GetInfosFromSources() 
         {
             try
             {
@@ -71,6 +75,10 @@ namespace Stolzenberg.Covid
                     var articlesFromSource = await GetSource(source);
                     articles.AddRange(articlesFromSource);
                 }    
+
+                _logger.LogInformation($"Successfully searched {_sources.Length + 1} sources.");
+
+                return articles;
             }
             catch (System.Exception e)
             {
@@ -112,15 +120,24 @@ namespace Stolzenberg.Covid
                 foreach (var node in nodes)
                 {
                     var attribute = node.Attributes.FirstOrDefault(a => a.Name == "href");
-                    if (node.InnerText.Length == 0 
-                        || attribute == null) 
+
+                    string header = RemoveSpecialCharacters(node.InnerText.Trim());
+
+                    if (string.IsNullOrEmpty(header) || attribute == null) 
+                    {
+                        continue;
+                    }
+
+                    string link = attribute.Value.StartsWith("http") ? attribute.Value : source.HrefLink + attribute.Value;
+
+                    if (articles.Any(a => a.Link == link)) 
                     {
                         continue;
                     }
 
                     articles.Add(new Article() {
-                        Header = node.InnerText,
-                        Link = source.HrefLink + attribute.Value
+                        Header = header,
+                        Link = link
                     });
                 }
 
@@ -132,6 +149,10 @@ namespace Stolzenberg.Covid
                 throw;
             }
         }
+
+        private string RemoveSpecialCharacters(string str)
+        {
+            return Regex.Replace(str, "[^a-zA-Z0-9_. ]+", "", RegexOptions.Compiled);
+        }
     }
 }
-
