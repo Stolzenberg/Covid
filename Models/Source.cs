@@ -5,5 +5,6 @@ namespace Stolzenberg.Models
     {
         public string Link { get; set; }
         public string HrefLink { get; set; }
+        public string SourceName { get; set; }
     }
 }

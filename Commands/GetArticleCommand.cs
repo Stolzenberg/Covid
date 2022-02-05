@@ -32,11 +32,20 @@ namespace Stolzenberg.Commands
                     return null;
                 }
 
+                var imgNode = _node.ChildNodes.FirstOrDefault(c => c.Name == "img");
+                if (imgNode != null) 
+                {
+
+                }
+
                 string link = attribute.Value.StartsWith("http") ? attribute.Value : _source.HrefLink + attribute.Value;
 
-                return new Article() {
+                return new Article() 
+                {
                     Header = header,
-                    Link = link
+                    ImgUrl = "XXX",
+                    Link = link,
+                    Source = _source.SourceName
                 };
             }
             catch (System.Exception)
