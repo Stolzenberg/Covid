@@ -27,10 +27,10 @@ namespace Stolzenberg.Commands
                 var getHtmlDocumentCommand = new GetHtmlDocumentCommand(_source.Link);
                 var htmlDocument = await getHtmlDocumentCommand.Execute();
 
-                var createXPathQueryCommand = new CreateXPathQueryCommand(_keywordService);
+                var createXPathQueryCommand = new CreateXPathQueryCommand("href", _keywordService);
                 string searchQuery = createXPathQueryCommand.Execute();
 
-                // Query the entire html document and find every node that has an a (link) tag with the href that contains one of the keywords.
+                // Query the entire html document and find every node that has an a (link) tag with href attribute that contains one of the keywords.
                 var nodes = htmlDocument.DocumentNode.SelectNodes($"//a[{searchQuery}]");
 
                 if (nodes == null) 
@@ -41,7 +41,7 @@ namespace Stolzenberg.Commands
                 // Go through all html nodes and execute the get articles command.
                 foreach (var node in nodes)
                 {
-                    var getArticleCommand = new GetArticleCommand(_source, node);
+                    var getArticleCommand = new GetArticleCommand(_source, node, _keywordService);
                     var article = getArticleCommand.Execute();
 
                     if (article == null) 

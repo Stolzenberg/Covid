@@ -9,9 +9,11 @@ namespace Stolzenberg.Commands
     {
         private readonly HttpClient _client = new HttpClient();
         private readonly IKeywordService _keywordService;
+        private readonly string _attribute;
 
-        public CreateXPathQueryCommand(IKeywordService keywordService)
+        public CreateXPathQueryCommand(string attribute, IKeywordService keywordService)
         {
+            _attribute = attribute;
             _keywordService = keywordService;
         }
 
@@ -23,7 +25,7 @@ namespace Stolzenberg.Commands
 
             for (int i = 0; i < keywords.Count; i++)
             {
-                stringBuilder.Append($"contains(@href, '{keywords[i]}')");
+                stringBuilder.Append($"contains(@{_attribute}, '{keywords[i]}')");
 
                 if (i < keywords.Count - 1) 
                 {

@@ -35,7 +35,6 @@ namespace Stolzenberg.AzureFunctions
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req)
         {
-
             _logger.LogInformation("Get covid info was triggerd executing get infos from sources now.");
 
             var articles = new List<Article>();
