@@ -1,6 +1,4 @@
 ## Covid News Scraper API
-### Little application project
-
 Searches predefined web pages for articles that contain keywords, then puts the article headings and a direct link into a model and sends it back as a json array.
 
 Link to the angular front-end repository: https://github.com/Stolzenberg/CovidAngular
